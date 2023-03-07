@@ -2,7 +2,7 @@ BeautifulSoup
 =============================
 BeautifulSoup 的js实现。功能参考 Beautiful Soup 4.4.0 文档：https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#。 基于 JSSoup-0.0.15 修改，添加了TypeScript支持，增加了部分方法，感谢原作者。
 **BeautifulSoup** 使用 [tautologistics/node-htmlparser](https://github.com/tautologistics/node-htmlparser) 作为 HTML dom parser。 
-BeautifulSoup 支持在 **node** and **browser**  使用。  
+BeautifulSoup 支持在 **node** 和 **browser**  中使用。  
 
 # Install
 ```
