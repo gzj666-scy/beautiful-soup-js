@@ -1,0 +1,18 @@
+{
+  "include": [
+    "./src/**/*"
+  ],
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "./build/lib",
+    "declaration": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "preserveConstEnums": false,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+  }
+}

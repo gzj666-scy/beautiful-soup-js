@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "outDir": "./build",
+    // "sourceMap": true,
+    // "declaration": true,
+    // "declarationMap": true,
+    // "declarationDir": "build/types",
+    "esModuleInterop": true,
+    "removeComments": true,
+    "preserveConstEnums": false,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+  }
+}

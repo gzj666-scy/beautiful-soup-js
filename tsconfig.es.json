@@ -1,0 +1,18 @@
+{
+  "include": [
+    "./src/**/*"
+  ],
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "outDir": "./build/es",
+    "declaration": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "preserveConstEnums": false,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+  }
+}
