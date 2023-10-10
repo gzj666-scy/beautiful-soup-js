@@ -1,3 +1,5 @@
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
 function commonjsRequire () {
 	throw new Error('Dynamic requires are not currently supported by rollup-plugin-commonjs');
 }
@@ -8,45 +10,44 @@ function createCommonjsModule(fn, module) {
 
 var htmlparser = createCommonjsModule(function (module, exports) {
 (function () {
-function runningInNode () {
-return true;
-	return(
-		(typeof commonjsRequire) == "function"
-		&&
-		('object') == "object"
-		&&
-		('object') == "object"
-		&&
-		(typeof __filename) == "string"
-		&&
-		(typeof __dirname) == "string"
+	function runningInNode() {
+		return (
+			(typeof commonjsRequire) == "function"
+			&&
+			('object') == "object"
+			&&
+			('object') == "object"
+			&&
+			(typeof __filename) == "string"
+			&&
+			(typeof __dirname) == "string"
 		);
-}
-if (!runningInNode()) {
-	if (!this.Tautologistics)
-		this.Tautologistics = {};
-	else if (this.Tautologistics.NodeHtmlParser)
-		return;
-	this.Tautologistics.NodeHtmlParser = {};
-	exports = this.Tautologistics.NodeHtmlParser;
-}
-var ElementType = {
-	  Text: "text"
-	, Directive: "directive"
-	, Comment: "comment"
-	, Script: "script"
-	, Style: "style"
-	, Tag: "tag"
-};
-function Parser (handler, options) {
-	this._options = options ? options : { };
-	if (this._options.includeLocation == undefined) {
-		this._options.includeLocation = false;
 	}
-	this.validateHandler(handler);
-	this._handler = handler;
-	this.reset();
-}
+	var globalObject = runningInNode() ? commonjsGlobal : window;
+	if (!runningInNode()) {
+		if (!globalObject.Tautologistics)
+			globalObject.Tautologistics = {};
+		else if (globalObject.Tautologistics.NodeHtmlParser)
+			return;
+		globalObject.Tautologistics.NodeHtmlParser = exports;
+	}
+	var ElementType = {
+		Text: "text"
+		, Directive: "directive"
+		, Comment: "comment"
+		, Script: "script"
+		, Style: "style"
+		, Tag: "tag"
+	};
+	function Parser(handler, options) {
+		this._options = options ? options : {};
+		if (this._options.includeLocation == undefined) {
+			this._options.includeLocation = false;
+		}
+		this.validateHandler(handler);
+		this._handler = handler;
+		this.reset();
+	}
 	Parser._reTrim = /(^\s+|\s+$)/g;
 	Parser._reTrimComment = /(^\!--|--$)/g;
 	Parser._reWhitespace = /\s/g;
@@ -54,18 +55,18 @@ function Parser (handler, options) {
 	Parser._reAttrib =
 		/([^=<>\"\'\s]+)\s*=\s*"([^"]*)"|([^=<>\"\'\s]+)\s*=\s*'([^']*)'|([^=<>\"\'\s]+)\s*=\s*([^'"\s]+)|([^=<>\"\'\s\/]+)/g;
 	Parser._reTags = /[\<\>]/g;
-	Parser.prototype.parseComplete = function Parser$parseComplete (data) {
+	Parser.prototype.parseComplete = function Parser$parseComplete(data) {
 		this.reset();
 		this.parseChunk(data);
 		this.done();
 	};
-	Parser.prototype.parseChunk = function Parser$parseChunk (data) {
+	Parser.prototype.parseChunk = function Parser$parseChunk(data) {
 		if (this._done)
 			this.handleError(new Error("Attempted to parse chunk after parsing already done"));
 		this._buffer += data;
 		this.parseTags();
 	};
-	Parser.prototype.done = function Parser$done () {
+	Parser.prototype.done = function Parser$done() {
 		if (this._done)
 			return;
 		this._done = true;
@@ -73,10 +74,10 @@ function Parser (handler, options) {
 			var rawData = this._buffer;
 			this._buffer = "";
 			var element = {
-				  raw: rawData
+				raw: rawData
 				, data: (this._parseState == ElementType.Text) ? rawData : rawData.replace(Parser._reTrim, "")
 				, type: this._parseState
-				};
+			};
 			if (this._parseState == ElementType.Tag || this._parseState == ElementType.Script || this._parseState == ElementType.Style)
 				element.name = this.parseTagName(element.data);
 			this.parseAttribs(element);
@@ -85,7 +86,7 @@ function Parser (handler, options) {
 		this.writeHandler();
 		this._handler.done();
 	};
-	Parser.prototype.reset = function Parser$reset () {
+	Parser.prototype.reset = function Parser$reset() {
 		this._buffer = "";
 		this._done = false;
 		this._elements = [];
@@ -93,7 +94,7 @@ function Parser (handler, options) {
 		this._current = 0;
 		this._next = 0;
 		this._location = {
-			  row: 0
+			row: 0
 			, col: 0
 			, charOffset: 0
 			, inBuffer: 0
@@ -107,7 +108,7 @@ function Parser (handler, options) {
 	Parser.prototype._handler = null;
 	Parser.prototype._buffer = null;
 	Parser.prototype._done = false;
-	Parser.prototype._elements =  null;
+	Parser.prototype._elements = null;
 	Parser.prototype._elementsCurrent = 0;
 	Parser.prototype._current = 0;
 	Parser.prototype._next = 0;
@@ -115,7 +116,7 @@ function Parser (handler, options) {
 	Parser.prototype._parseState = ElementType.Text;
 	Parser.prototype._prevTagSep = '';
 	Parser.prototype._tagStack = null;
-	Parser.prototype.parseTagAttribs = function Parser$parseTagAttribs (elements) {
+	Parser.prototype.parseTagAttribs = function Parser$parseTagAttribs(elements) {
 		var idxEnd = elements.length;
 		var idx = 0;
 		while (idx < idxEnd) {
@@ -123,9 +124,9 @@ function Parser (handler, options) {
 			if (element.type == ElementType.Tag || element.type == ElementType.Script || element.type == ElementType.style)
 				this.parseAttribs(element);
 		}
-		return(elements);
+		return (elements);
 	};
-	Parser.prototype.parseAttribs = function Parser$parseAttribs (element) {
+	Parser.prototype.parseAttribs = function Parser$parseAttribs(element) {
 		if (element.type != ElementType.Script && element.type != ElementType.Style && element.type != ElementType.Tag)
 			return;
 		var tagName = element.data.split(Parser._reWhitespace, 1)[0];
@@ -148,22 +149,22 @@ function Parser (handler, options) {
 			}
 		}
 	};
-	Parser.prototype.parseTagName = function Parser$parseTagName (data) {
+	Parser.prototype.parseTagName = function Parser$parseTagName(data) {
 		if (data == null || data == "")
-			return("");
+			return ("");
 		var match = Parser._reTagName.exec(data);
 		if (!match)
-			return("");
-		return((match[1] ? "/" : "") + match[2]);
+			return ("");
+		return ((match[1] ? "/" : "") + match[2]);
 	};
-	Parser.prototype.parseTags = function Parser$parseTags () {
+	Parser.prototype.parseTags = function Parser$parseTags() {
 		var bufferEnd = this._buffer.length - 1;
 		while (Parser._reTags.test(this._buffer)) {
 			this._next = Parser._reTags.lastIndex - 1;
 			var tagSep = this._buffer.charAt(this._next);
 			var rawData = this._buffer.substring(this._current, this._next);
 			var element = {
-				  raw: rawData
+				raw: rawData
 				, data: (this._parseState == ElementType.Text) ? rawData : rawData.replace(Parser._reTrim, "")
 				, type: this._parseState
 			};
@@ -279,9 +280,9 @@ function Parser (handler, options) {
 					element.type != ElementType.Directive
 					&&
 					element.data.charAt(element.data.length - 1) == "/"
-					)
+				)
 					this._elements.push({
-						  raw: "/" + element.name
+						raw: "/" + element.name
 						, data: "/" + element.name
 						, name: "/" + element.name
 						, type: element.type
@@ -301,7 +302,7 @@ function Parser (handler, options) {
 		this._current = 0;
 		this.writeHandler();
 	};
-	Parser.prototype.getLocation = function Parser$getLocation (startTag) {
+	Parser.prototype.getLocation = function Parser$getLocation(startTag) {
 		var c,
 			l = this._location,
 			end = this._current - (startTag ? 1 : 0),
@@ -316,11 +317,11 @@ function Parser (handler, options) {
 			}
 		}
 		return {
-			  line: l.row + l.inBuffer + 1
-			, col: l.col + (chunk ? 0: 1)
+			line: l.row + l.inBuffer + 1
+			, col: l.col + (chunk ? 0 : 1)
 		};
 	};
-	Parser.prototype.validateHandler = function Parser$validateHandler (handler) {
+	Parser.prototype.validateHandler = function Parser$validateHandler(handler) {
 		if ((typeof handler) != "object")
 			throw new Error("Handler is not an object");
 		if ((typeof handler.reset) != "function")
@@ -336,7 +337,7 @@ function Parser (handler, options) {
 		if ((typeof handler.writeDirective) != "function")
 			throw new Error("Handler method 'writeDirective' is invalid");
 	};
-	Parser.prototype.writeHandler = function Parser$writeHandler (forceFlush) {
+	Parser.prototype.writeHandler = function Parser$writeHandler(forceFlush) {
 		forceFlush = !!forceFlush;
 		if (this._tagStack.length && !forceFlush)
 			return;
@@ -358,20 +359,20 @@ function Parser (handler, options) {
 			}
 		}
 	};
-	Parser.prototype.handleError = function Parser$handleError (error) {
+	Parser.prototype.handleError = function Parser$handleError(error) {
 		if ((typeof this._handler.error) == "function")
 			this._handler.error(error);
 		else
 			throw error;
 	};
-function RssHandler (callback) {
-	RssHandler.super_.call(this, callback, { ignoreWhitespace: true, verbose: false, enforceEmptyTags: false });
-}
-inherits(RssHandler, DefaultHandler);
-	RssHandler.prototype.done = function RssHandler$done () {
-		var feed = { };
+	function RssHandler(callback) {
+		RssHandler.super_.call(this, callback, { ignoreWhitespace: true, verbose: false, enforceEmptyTags: false });
+	}
+	inherits(RssHandler, DefaultHandler);
+	RssHandler.prototype.done = function RssHandler$done() {
+		var feed = {};
 		var feedRoot;
-		var found = DomUtils.getElementsByTagName(function (value) { return(value == "rss" || value == "feed"); }, this.dom, false);
+		var found = DomUtils.getElementsByTagName(function (value) { return (value == "rss" || value == "feed"); }, this.dom, false);
 		if (found.length) {
 			feedRoot = found[0];
 		}
@@ -460,20 +461,20 @@ inherits(RssHandler, DefaultHandler);
 		}
 		RssHandler.super_.prototype.done.call(this);
 	};
-function DefaultHandler (callback, options) {
-	this.reset();
-	this._options = options ? options : { };
-	if (this._options.ignoreWhitespace == undefined)
-		this._options.ignoreWhitespace = false;
-	if (this._options.verbose == undefined)
-		this._options.verbose = true;
-	if (this._options.enforceEmptyTags == undefined)
-		this._options.enforceEmptyTags = true;
-	if ((typeof callback) == "function")
-		this._callback = callback;
-}
+	function DefaultHandler(callback, options) {
+		this.reset();
+		this._options = options ? options : {};
+		if (this._options.ignoreWhitespace == undefined)
+			this._options.ignoreWhitespace = false;
+		if (this._options.verbose == undefined)
+			this._options.verbose = true;
+		if (this._options.enforceEmptyTags == undefined)
+			this._options.enforceEmptyTags = true;
+		if ((typeof callback) == "function")
+			this._callback = callback;
+	}
 	DefaultHandler._emptyTags = {
-		  area: 1
+		area: 1
 		, base: 1
 		, basefont: 1
 		, br: 1
@@ -494,52 +495,52 @@ function DefaultHandler (callback, options) {
 		this.dom = [];
 		this._done = false;
 		this._tagStack = [];
-		this._tagStack.last = function DefaultHandler$_tagStack$last () {
-			return(this.length ? this[this.length - 1] : null);
+		this._tagStack.last = function DefaultHandler$_tagStack$last() {
+			return (this.length ? this[this.length - 1] : null);
 		};
 	};
-	DefaultHandler.prototype.done = function DefaultHandler$done () {
+	DefaultHandler.prototype.done = function DefaultHandler$done() {
 		this._done = true;
 		this.handleCallback(null);
 	};
-	DefaultHandler.prototype.writeTag = function DefaultHandler$writeTag (element) {
+	DefaultHandler.prototype.writeTag = function DefaultHandler$writeTag(element) {
 		this.handleElement(element);
 	};
-	DefaultHandler.prototype.writeText = function DefaultHandler$writeText (element) {
+	DefaultHandler.prototype.writeText = function DefaultHandler$writeText(element) {
 		if (this._options.ignoreWhitespace)
 			if (DefaultHandler.reWhitespace.test(element.data))
 				return;
 		this.handleElement(element);
 	};
-	DefaultHandler.prototype.writeComment = function DefaultHandler$writeComment (element) {
+	DefaultHandler.prototype.writeComment = function DefaultHandler$writeComment(element) {
 		this.handleElement(element);
 	};
-	DefaultHandler.prototype.writeDirective = function DefaultHandler$writeDirective (element) {
+	DefaultHandler.prototype.writeDirective = function DefaultHandler$writeDirective(element) {
 		this.handleElement(element);
 	};
-	DefaultHandler.prototype.error = function DefaultHandler$error (error) {
+	DefaultHandler.prototype.error = function DefaultHandler$error(error) {
 		this.handleCallback(error);
 	};
 	DefaultHandler.prototype._options = null;
 	DefaultHandler.prototype._callback = null;
 	DefaultHandler.prototype._done = false;
 	DefaultHandler.prototype._tagStack = null;
-	DefaultHandler.prototype.handleCallback = function DefaultHandler$handleCallback (error) {
-			if ((typeof this._callback) != "function")
-				if (error)
-					throw error;
-				else
-					return;
-			this._callback(error, this.dom);
+	DefaultHandler.prototype.handleCallback = function DefaultHandler$handleCallback(error) {
+		if ((typeof this._callback) != "function")
+			if (error)
+				throw error;
+			else
+				return;
+		this._callback(error, this.dom);
 	};
-	DefaultHandler.prototype.isEmptyTag = function(element) {
+	DefaultHandler.prototype.isEmptyTag = function (element) {
 		var name = element.name.toLowerCase();
 		if (name.charAt(0) == '/') {
 			name = name.substring(1);
 		}
 		return this._options.enforceEmptyTags && !!DefaultHandler._emptyTags[name];
 	};
-	DefaultHandler.prototype.handleElement = function DefaultHandler$handleElement (element) {
+	DefaultHandler.prototype.handleElement = function DefaultHandler$handleElement(element) {
 		if (this._done)
 			this.handleCallback(new Error("Writing to the handler after done() called is not allowed without a reset()"));
 		if (!this._options.verbose) {
@@ -587,7 +588,7 @@ function DefaultHandler (callback, options) {
 		}
 	};
 	var DomUtils = {
-		  testElement: function DomUtils$testElement (options, element) {
+		testElement: function DomUtils$testElement(options, element) {
 			if (!element) {
 				return false;
 			}
@@ -618,16 +619,16 @@ function DefaultHandler (callback, options) {
 			}
 			return true;
 		}
-		, getElements: function DomUtils$getElements (options, currentElement, recurse, limit) {
+		, getElements: function DomUtils$getElements(options, currentElement, recurse, limit) {
 			recurse = (recurse === undefined || recurse === null) || !!recurse;
 			limit = isNaN(parseInt(limit)) ? -1 : parseInt(limit);
 			if (!currentElement) {
-				return([]);
+				return ([]);
 			}
 			var found = [];
 			var elementList;
-			function getTest (checkVal) {
-				return(function (value) { return(value == checkVal); });
+			function getTest(checkVal) {
+				return (function (value) { return (value == checkVal); });
 			}
 			for (var key in options) {
 				if ((typeof options[key]) != "function") {
@@ -638,14 +639,14 @@ function DefaultHandler (callback, options) {
 				found.push(currentElement);
 			}
 			if (limit >= 0 && found.length >= limit) {
-				return(found);
+				return (found);
 			}
 			if (recurse && currentElement.children) {
 				elementList = currentElement.children;
 			} else if (currentElement instanceof Array) {
 				elementList = currentElement;
 			} else {
-				return(found);
+				return (found);
 			}
 			for (var i = 0; i < elementList.length; i++) {
 				found = found.concat(DomUtils.getElements(options, elementList[i], recurse, limit));
@@ -653,31 +654,31 @@ function DefaultHandler (callback, options) {
 					break;
 				}
 			}
-			return(found);
+			return (found);
 		}
-		, getElementById: function DomUtils$getElementById (id, currentElement, recurse) {
+		, getElementById: function DomUtils$getElementById(id, currentElement, recurse) {
 			var result = DomUtils.getElements({ id: id }, currentElement, recurse, 1);
-			return(result.length ? result[0] : null);
+			return (result.length ? result[0] : null);
 		}
-		, getElementsByTagName: function DomUtils$getElementsByTagName (name, currentElement, recurse, limit) {
-			return(DomUtils.getElements({ tag_name: name }, currentElement, recurse, limit));
+		, getElementsByTagName: function DomUtils$getElementsByTagName(name, currentElement, recurse, limit) {
+			return (DomUtils.getElements({ tag_name: name }, currentElement, recurse, limit));
 		}
-		, getElementsByTagType: function DomUtils$getElementsByTagType (type, currentElement, recurse, limit) {
-			return(DomUtils.getElements({ tag_type: type }, currentElement, recurse, limit));
+		, getElementsByTagType: function DomUtils$getElementsByTagType(type, currentElement, recurse, limit) {
+			return (DomUtils.getElements({ tag_type: type }, currentElement, recurse, limit));
 		}
 	};
-	function inherits (ctor, superCtor) {
-		var tempCtor = function(){};
+	function inherits(ctor, superCtor) {
+		var tempCtor = function () { };
 		tempCtor.prototype = superCtor.prototype;
 		ctor.super_ = superCtor;
 		ctor.prototype = new tempCtor();
 		ctor.prototype.constructor = ctor;
 	}
-exports.Parser = Parser;
-exports.DefaultHandler = DefaultHandler;
-exports.RssHandler = RssHandler;
-exports.ElementType = ElementType;
-exports.DomUtils = DomUtils;
+	exports.Parser = Parser;
+	exports.DefaultHandler = DefaultHandler;
+	exports.RssHandler = RssHandler;
+	exports.ElementType = ElementType;
+	exports.DomUtils = DomUtils;
 })();
 });
 htmlparser.Parser;

@@ -1,6 +1,6 @@
 {
   "name": "beautiful-soup-js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Beautiful Soup 的js实现。功能参考 Beautiful Soup 4.4.0 文档：https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#。 基于 JSSoup-0.0.15 修改",
   "keywords": [
     "JavaScript",

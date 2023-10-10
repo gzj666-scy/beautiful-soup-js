@@ -1,4 +1,5 @@
-import htmlparser from "htmlparser";
+// import htmlparser from "htmlparser";
+import htmlparser from "./libs/htmlparser";
 import { SoupTag } from "./main/SoupTag";
 import { TreeBuilder } from "./main/TreeBuilder";
 import { SoupType } from "./main/Type";

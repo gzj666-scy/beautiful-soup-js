@@ -64,6 +64,42 @@ function tsc(done) {
     }
 }
 
+const copyArr = [
+    { path: 'libs/htmlparser.js', recursive: false },
+    { path: 'libs/node-htmlparser.js', recursive: false }
+]
+const toPath = ['./build/es/', './build/lib/']
+function copyFile(done) {
+    let mark = 0;
+    let _result = 0;
+    const start = function (result) {
+        mark--;
+        _result += result;
+        if (!mark) {
+            if (!_result) {
+                //进程全部执行完毕
+                console.log("copy success!");
+                done();
+            }
+        }
+    };
+    for (let i = 0; i < toPath.length; i++) {
+        const to = toPath[i];
+        for (let j = 0; j < copyArr.length; j++) {
+            mark++;
+            const copyPath = './src/' + copyArr[j].path;
+            const toPath = to + copyArr[j].path;
+            // nodejs 从 16.7.0 版本开始
+            fs.cp(copyPath, toPath, { recursive: copyArr[j].recursive }, (err) => {
+                if (err) {
+                    console.error(err);
+                }
+                start(err);
+            });
+        }
+    }
+}
+
 const options = {
     input: 'src/index.ts',
     output: [
@@ -204,7 +240,7 @@ async function revise(done) {
                 const stat = fs.statSync(fn);
                 if (stat.isFile()) {
                     let fileContent = fs.readFileSync(fn, { encoding: 'utf-8' });
-                    fileContent = fileContent.replace(`function runningInNode () {`, `function runningInNode () {\nreturn true;`);
+                    // fileContent = fileContent.replace(`function runningInNode () {`, `function runningInNode () {\nreturn true;`);
                     /// <reference path="./main/SoupElement.ts" />
                     const libsList = fileContent.match(/[/]+ <reference path=['"][\w-./]+['"] [/]>/g);
                     if (libsList) {
@@ -246,6 +282,7 @@ function compressJs() {
 exports.default = gulp.series(
     clear,
     tsc,
+    copyFile,
     compile,
     removeInternal,
     cleanJs,

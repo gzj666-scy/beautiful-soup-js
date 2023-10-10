@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const htmlparser_1 = __importDefault(require("htmlparser"));
+const htmlparser_1 = __importDefault(require("./libs/htmlparser"));
 const SoupTag_1 = require("./main/SoupTag");
 const TreeBuilder_1 = require("./main/TreeBuilder");
 const Type_1 = require("./main/Type");
